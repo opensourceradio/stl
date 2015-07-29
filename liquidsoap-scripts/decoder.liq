@@ -1,5 +1,7 @@
 #!/usr/bin/liquidsoap
 
+# Copyright 2015 Phantom Machine Works. See LICENSE for copying information.
+
 # Log liquidsoap messages to this file
 set( "log.file.path", "/var/log/liquidsoap/xmit-decode.log" )
 
