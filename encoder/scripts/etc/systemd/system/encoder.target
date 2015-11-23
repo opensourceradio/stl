@@ -1,0 +1,12 @@
+#
+## encoder.target
+## this unit file aggregates the services for the PMW STL encoder
+#
+[Unit]
+Description=PMW STL Encoder
+Documentation=man:systemd.special(7)
+StopWhenUnneeded=no
+Requires=multi-user.target
+Conflicts=rescue.target
+Wants=jackd@pmwsrv.service
+AllowIsolate=yes

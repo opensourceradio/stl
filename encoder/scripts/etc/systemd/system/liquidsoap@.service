@@ -1,0 +1,18 @@
+[Unit]
+Description=PMW STL Liquidsoap Encoder
+After=jackd@%i.service
+Requires=jackd@%i.service
+
+[Service]
+User=%i
+ExecStart=/usr/bin/liquidsoap --verbose /etc/liquidsoap/10-stl-encoder.liq
+ExecStartPost=/usr/local/bin/pmw-encoder-jack-connect.sh
+Type=simple
+Restart=always
+KillSignal=SIGHUP
+StandardOutput=syslog
+StandardError=inherit
+EnvironmentFile=-/etc/locale.conf
+
+[Install]
+WantedBy=encoder.target

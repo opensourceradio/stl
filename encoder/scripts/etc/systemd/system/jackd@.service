@@ -1,0 +1,17 @@
+[Unit]
+Description=Jack Audio Server
+After=sound.target
+Requires=sound.target network-online.target
+
+[Service]
+User=%i
+ExecStart=/usr/local/bin/pmw-jackd-start.sh
+Type=simple
+Restart=always
+KillSignal=SIGHUP
+StandardOutput=syslog
+StandardError=inherit
+EnvironmentFile=-/etc/locale.conf
+
+[Install]
+WantedBy=encoder.target
