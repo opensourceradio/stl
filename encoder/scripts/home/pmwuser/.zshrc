@@ -2,51 +2,62 @@
 
 trap "" 2 3
 
-# The primary interface is the interface with which the default route
-# is associated.
-primaryInterface=${PRIMARY_INTERFACE:-$(ip route | awk '/^default/{print $5}')}
-
 typeset -a menu command
-menu=(
-    "Show active network interfaces"
-    "Show MAC address for ${primaryInterface}"
-    "Show IP address for ${primaryInterface}"
-    "Show JACK status"
-    "Show Encoder (Liquidsoap) status"
-    "Show Icecast status"
-)
-command=(
-    "ip link show up"
-    "cat /sys/class/net/${primaryInterface}/address"
-    "ip -o -4 addr show dev ${primaryInterface} | awk '/ inet /{print \$4}' | cut -d/ -f1"
-    "systemctl status jackd@pmwsrv.service"
-    "systemctl status liquidsoap@pmwsrv.service"
-    "systemctl status icecast2.service"
-)
+typeset -R 2 count
 
 while : ; do
-    count=1
+    count=0
+
+    # The primary interface is the interface with which the default route
+    # is associated.
+    primaryInterface=${PRIMARY_INTERFACE:-$(ip route | awk '/^default/{print $5}')}
+
+    menu=(
+	"Quit and log out"
+	"Show active network interfaces"
+	"Show MAC address for \${primaryInterface}"
+	"Show IP address for \${primaryInterface}"
+	"Show JACK status"
+	"Show Liquidsoap status"
+	"Show Icecast status"
+    )
+    # Note: We start with the first actual menu choice here even
+    # though the menu starts with "Quit". This is due to the ZSH
+    # arrays being 1-based rather than 0-based.
+    command=(
+	"ip link show up"
+	"cat /sys/class/net/\${primaryInterface}/address"
+	"ip -o -4 addr show dev \${primaryInterface} | awk '/ inet /{print \$4}' | cut -d/ -f1"
+	"systemctl status jackd@pmwsrv.service"
+	"systemctl status liquidsoap@pmwsrv.service"
+	"systemctl status icecast2.service"
+    )
+
     for menuItem in ${menu} ; do
-	echo "${count}) ${menuItem}"
+	echo "${count}) $(eval echo ${menuItem})"
 	(( count++ ))
     done
-    echo "\ns) Escape this menu and start a shell"
-    echo "q) Quit and log out"
+    echo 
 
-    read choice\?"Enter your choice: "
+    read choice\?"Type your choice and press <Enter>: "
 
     echo
 
-    if (( choice > 1 && choice < count )) ; then
+    if [[ -z "${choice}" ]] ; then
+	echo "Please enter a number between 0 and $(( count - 1 ))."
+    elif [[ "${choice}" =~ '[[:space:]]*[Ss][Hh][Ee][Ll]{1,2}$' ]] ; then
+	echo "Launching a 'shell'. Press <Ctrl-D> or type the word 'exit' to quit the shell.\n"
+	${SHELL} -i -f
+    elif [[ "${choice}" =~ '[[:space:]]*[[:alpha:]]{1,}' ]] ; then
+	echo "'${choice}' is not an option. Please enter a number between 0 and $(( count - 1 ))."
+    elif [[ "${choice}" =~ '[[:space:]]*[[:alnum:]]+[[:space:]]+' ]] ; then
+	echo "'${choice}' is not an option. Please enter a number between 0 and $(( count - 1 ))."
+    elif (( choice == 0 )) ; then
+	exit
+    elif (( choice > 0 && choice < count )) ; then
 	eval $(echo ${command[${choice}]})
-    elif [[ "${choice}" =~ 'q' ]] ; then
-	 exit
-    elif [[ "${choice}" =~ 's' ]] ; then
-	${SHELL} -i
-    elif [[ -z "${choice}" ]] ; then
-	echo "Please enter a number, 'q' to quit or 's' for a shell."
     else
-	echo "Did not understand '${choice}'. Please enter a number, 'q' to quit or 's' for a shell."
+	echo "'${choice}' is not an option. Please enter a number between 0 and $(( count - 1 ))."
     fi
 
     echo
