@@ -2,7 +2,9 @@
 
 ##############################################################################
 ##
-## Encode from the on-board audio card via JACK, send to localhost:80
+## Copyright 2015 Phantom Machine Works. See LICENSE for copying information.
+##
+## Encode from the on-board audio card via JACK, send to stlHost:stlPort
 ## where there is a listening icecast server.
 ##
 ## Note: the password for the source client in the icecast
@@ -39,10 +41,10 @@ stlDesc = "KWVH-LP STL"
 stlURL  = "http://localhost:8000/live"
 
 ## create a new clock that will handle all the stream outputs
-#clock.assign_new (
-#  id = "stl",
-#  sync = true,
-#  [
+clock.assign_new (
+  id = "stl",
+  sync = true,
+  [
     # output the to the transmitter icecast stream server in MP3 format
     output.icecast (
       start = true,
@@ -63,32 +65,11 @@ stlURL  = "http://localhost:8000/live"
       %mp3( samplerate = 48000, stereo = true, bitrate = 320, internal_quality = 1 ),
 
       # (unlabeled) source:
-#      mksafe( buffer( buffer = 0.5, max = 1.0, feed ))
-      mksafe( feed )
+      # buffer is necessary when using the internal liquidsoap clock
+      mksafe( buffer( buffer = 0.5, max = 1.0, feed ))
     )
-    # output the to the XKCD test stream host at OVH in MP3 format
-    output.icecast (
-      start = true,
-      id = "test-stream",
-      protocol = "http",
-      host = "stream.phantommachineworks.media",
-      port = 8080,
-      user = "source",
-      password = "dr1$()urc3",
-      mount = "live",
-      url = "http://stream.phantommachineworks.media:8080/live",
-      description = "Testing",
-
-      # (unlabeled) format:
-      # internal_quality: Lame algorithms internal quality. A value
-      # between 0 and 9, 0 being highest quality and 9 the worst
-      # (default: 2).
-      %mp3( samplerate = 48000, stereo = true, bitrate = 320, internal_quality = 1 ),
-
-      # (unlabeled) source:
-#      mksafe( buffer( buffer = 0.5, max = 1.0, feed ))
-      mksafe( feed )
-    )
+###
+###    # Example of a local OGG Vorbis archive of the audio signal:
 ###
 ###    # Create an archive file of the stream
 ###    #  "/audio/archive/%Y/%m/%d/%H-%M-%S.ogg"
@@ -101,7 +82,7 @@ stlURL  = "http://localhost:8000/live"
 ###      reopen_when = { 0m0s },
 ###
 ###      # (unlabeled) format
-###      %vorbis( samplerate = 44100, channels = 2, quality = 0.25 ),
+###      %vorbis( samplerate = 48000, channels = 2, quality = 0.25 ),
 ###
 ###      # (unlabeled) filename
 ###      "/audio/archive/%Y/%m/%d/%H-%M-%S.ogg",
@@ -109,5 +90,5 @@ stlURL  = "http://localhost:8000/live"
 ###      # (unlabeled) source
 ###      amplify( 10.0, mksafe( buffer( feed )))
 ###    )
-#  ]
-#)
+  ]
+)
