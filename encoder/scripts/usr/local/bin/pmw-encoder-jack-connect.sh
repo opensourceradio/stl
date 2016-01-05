@@ -61,16 +61,17 @@ sleepDuration=0.50
 sleep $(( sleepDuration * 2 ))
 
 while (( thisAttempt < attemptLimit )) ; do
-    jackPorts=( $(jack_lsp) )
+    jackPorts=( $(/usr/bin/jack_lsp) )
+    x=0
     for need in ${allPorts} ; do
-	x=0
+	found=0
 	for port in ${jackPorts} ; do
-	    [[ ${port} =~ "${need}_\d+" ]] && x=1
+	    [[ ${port} =~ "${need}_\d+" ]] && { (( x++ )) ; found=1; }
 	done
 	
-	(( x )) && break
+	(( found )) && break
     done
-    if (( x == 0 )) ; then
+    if (( x == ${#allPorts} )) ; then
 	: ports are connected, we are good to go
 	break
     fi
