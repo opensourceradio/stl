@@ -2,7 +2,7 @@
   <!-- location and admin are two arbitrary strings that are e.g. visible
        on the server info page of the icecast web interface
        (server_version.xsl). -->
-  <location>KWVH-LP Studio</location>
+  <location>%LOCATION%</location>
   <admin>icemaster@localhost</admin>
 
   <limits>
@@ -31,13 +31,13 @@
 
   <authentication>
     <!-- Sources log in with username 'source' -->
-    <source-password>hiQ8eCDbXyS0txD2GigSZ@3zShh7hD%x</source-password>
+    <source-password>%SOURCE-PASSWORD%</source-password>
     <!-- Relays log in username 'relay' -->
     <relay-password>DISABLED</relay-password>
 
     <!-- Admin logs in with the username given below -->
-    <admin-user>kwvh-admin</admin-user>
-    <admin-password>pMIqDUXu9HCzFhf2FWvl5%FZZ+mNsH0T</admin-password>
+    <admin-user>%ADMIN-USER%</admin-user>
+    <admin-password>%ADMIN-PASSWORD%</admin-password>
   </authentication>
 
   <!-- set the mountpoint for a shoutcast source to use, the default if not
